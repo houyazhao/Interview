@@ -8,3 +8,19 @@
 #### 盒子模型有两种，W3C和IE盒子模型
 - W3C定义的盒子模型包括margin、border、padding、content ，元素的width=content的宽度
 - IE盒子模型与W3C的盒子模型唯一区别就是元素的宽度，元素的width=content+padding+border
+
+#### 3、元素定位有哪些？
+position为元素定位属性，包含 absolute绝对定位、fixed  固定定位（老IE6不支持）、relative相对定位、static
+
+#### 4、样式导入有哪些方式？
+- link
+```
+<link href="index.css" rel="stylesheet">
+```
+- import
+```
+<style type="text/css">  
+@import "index.css";  
+</style> 
+```
+
