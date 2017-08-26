@@ -285,13 +285,6 @@ parseInt(s,radix)解析一个字符串，并返回一个整数。
 参数
 s：表示字符串
 radix：表示其它进制转十进制的基数，范围在2~36，不在这个范围的返回NaN。该参数可以省略或为0，这种情况会根据字符串的开头来判断基数，规则如下：
-1）字符串以"0x" 开头，基数为16
-2）字符以"0"开头，版本低于ECMAScript 5的，基数为8。版本为ECMAScript 5的，基数为10
-3）以 1 ~ 9 的数字开头，基数为10。
-101=1*20+0*21+1*22=1+0+4=5 
-所以 parseInt(“101”,2)返回5
-由此我们可以推到出parseInt(“210”,3)的结果
-parseInt("210",3)=0*30+1*31+2*32=0+3+18=21 
 题目的结果推导
 ["1","2", "3"].map(parseInt)
 [0]=parseInt(“1”,0);//1*100=1*1=1
@@ -300,8 +293,218 @@ parseInt("210",3)=0*30+1*31+2*32=0+3+18=21
 所以最终的结果是 [1,NaN,NaN]
 
 
+#### 22、eval是做什么的？
+##### eval()的作用
+把字符串参数解析成js代码并运行，并返回执行的结果；
+```
+eval("2+3");//执行加运算，并返回运算值。  
+eval("var age=10");//声明一个age变量  
+```
+##### eval的作用域
+```
+function a(){  
+ eval("var x=1"); //等效于 var x=1;  
+ console.log(x); //输出1  
+}  
+a();  
+console.log(x);//错误 x没有定义 
+```
+说明作用域在它所有的范围内容有效
+##### 注意
+应该避免使用eval，不安全，非常耗性能（2次，一次解析成js语句，一次执行）。
+##### 其它作用
+由JSON字符串转换为JSON对象的时候可以用eval，例如
+```
+var json = "{name:'Mr.CAO',age:30}";  
+var jsonObj = eval("("+json+")");  
+console.log(jsonObj);  
+```
 
 
+#### 23、new操作符具体干了什么呢?
+```
+var Func = function(){};  
+var func = new Func(); 
+```
+##### new共经过了4几个阶段
+1、创建一个空对象
+```
+var obj=new Object();  
+```
+2、设置原型链
+```
+obj.__proto__= Func.prototype;  
+```
+3、让Func中的this指向obj，并执行Func的函数体。
+```
+var result =Func.call(obj); 
+```
+4、判断Func的返回值类型：
+如果是值类型，返回obj。如果是引用类型，就返回这个引用类型的对象。
+```
+if (typeof(result) == "object"){  
+  func=result;  
+}  
+else{  
+    func=obj;;  
+}  
+```
+
+#### 24、CSS3有哪些新特性？
+1.CSS3的选择器
+1）E:last-child 匹配父元素的最后一个子元素E。
+2）E:nth-child(n)匹配父元素的第n个子元素E。 
+3）E:nth-last-child(n) CSS3 匹配父元素的倒数第n个子元素E。
+2. 圆角
+3.阴影（Shadow）
+4.CSS3 的渐变效果 
+5.css弹性盒子模型
+6. CSS3制作特效
+
+#### 25、html5有哪些新特性？
+##### H5新特性
+增强了图形渲染、影音、数据存储、多任务处理等处理能力主要表现在
+1)  绘画 canvas;
+2)  本地离线存储 localStorage
+3)  sessionStorage的数据在浏览器关闭后自动删除;操作参考localStorage
+4)  用于媒介回放的 video和 audio 元素;
+5)  语意化更好的内容元素，比如article、footer、header、nav、section;
+6)  表单控件，calendar、date、time、email、url、search;
+7)  Geolocation 地理定位
+
+#### 26、请描述一下 cookies，sessionStorage 和 localStorage 的区别？
+相同点：都存储在客户端
+不同点：
+1.存储大小
+cookie数据大小不能超过4k。
+sessionStorage和localStorage 虽然也有存储大小的限制，但比cookie大得多，可以达到5M或更大。
+2.有效时间
+localStorage    存储持久数据，浏览器关闭后数据不丢失除非主动删除数据；
+sessionStorage  数据在当前浏览器窗口关闭后自动删除。
+cookie          设置的cookie过期时间之前一直有效，即使窗口或浏览器关闭
+3. 数据与服务器之间的交互方式
+cookie的数据会自动的传递到服务器，服务器端也可以写cookie到客户端
+sessionStorage和localStorage不会自动把数据发给服务器，仅在本地保存。
+
+cookie的表示方式示例
+```
+var name = "jack";  
+var pwd = "123";  
+var now = new Date();  
+now.setTime(now.getTime() +1 * 24 * 60 * 60 * 1000);//转毫秒  
+var path = "/";//可以是具体的网页  
+document.cookie = "name=" + name + ";
+expires=" + now.toUTCString() + ";
+path=" + path;//姓名  
+document.cookie= "pwd=" + pwd + ";
+expires=" + now.toUTCString()+ ";
+path=" + path; //密码  
+
+var data = document.cookie;//获取对应页面的cookie  
+//解析cookie
+//方式1：截取字符串
+function getKey(key) {  
+    var data = document.cookie;  
+    var findStr = key + "=";  
+    //找到key的位置  
+    var index = data.indexOf(findStr);  
+    if (index == -1)  
+        return null;  
+    var subStr = data.substring(index +findStr.length);  
+    var lastIndex = subStr.indexOf(";");  
+    if (lastIndex == -1) {  
+        return subStr;  
+ } else {  
+        return subStr.substring(0,lastIndex);  
+ }  
+}  
+//方式2：使用正则表达式+JSON
+function getKey(key) {  
+    return JSON.parse("{\"" +document.cookie.replace(/;\s+/gim, "\",\"").replace(/=/gim, "\":\"") + "\"}")[key];  
+}  
+//清除cookie
+var name = null;  
+var pwd = null;  
+var now = new Date();  
+var path = "/";//可以是具体的网页  
+document.cookie= "name=" + name + ";expires=" + now.toUTCString()+ ";path=" + path;//姓名  
+document.cookie = "pwd=" + pwd + ";expires=" + now.toUTCString()+ ";path=" + path; //密码  
+```
+
+#### 27、页面渲染原理是什么？
+##### 渲染引擎
+不同的浏览器有不同的渲染引擎，对于渲染引擎的使用总结如下：
+Trident(MSHTML)内核：IE,MaxThon,TT,The World,360,搜狗浏览器等
+Gecko内核：Netscape6及以上版本，FF,MozillaSuite/SeaMonkey等
+Presto内核：Opera7及以上
+Webkit内核：Safari,Chrome等
+
+##### 渲染主流程
+第一步：渲染引擎开始解析html，根据标签构建DOM节点
+第二步：根据css样式构建渲染树，包括元素的大小、颜色，隐藏的元素不会被构建到该树中。
+第三步：根据css样式构建布局树，主要是确定元素要显示的位置。
+第四步：根据前面的信息，绘制渲染树。
+
+#### 28、你了解跨域请求吗？
+##### 什么是跨域请求
+基于JavaScript的安全，JavaScript同源策略要求一个网站不能调用其它网站的js对象。构成跨域的条件就是一个页面的URL**协议、域名、端口**与另一个页面的URL只要有一个不同就构成了跨域请求。
+##### 特别注意两点：
+第一：如果是协议和端口造成的跨域问题“前台”是无能为力的，
+第二：在跨域问题上，域仅仅是通过“URL的首部”来识别而不会根据域名对应的IP地址是否相同来判断。
+“URL的首部”可以理解为“协议, 域名 和 端口 必须匹配”。
+
+##### （一）JSONP
+无法发送post请求
+```
+<script>  
+    $.ajax({  
+        url:"http://localhost:3000/users/userlist",  
+        type:"get",  
+        dataType:"jsonp",  
+        success:function(e){  
+            console.log(e);  
+        }  
+    });  
+</script>  
+```
+
+##### （二）在服务器端设置同源策略地址
+在响应头上添加Access-Control-Allow-Origin属性，指定同源策略的地址。同源策略默认地址是网页的本身。
+#####（三）H5新特性postMessage
+
+
+#### 29、页面优化有哪些方法
+一、减少操作量
+尽量减少 HTTP 请求
+1) 合并文件，比如把多个 CSS 文件合成一个； 
+2) CSS Sprites 利用 CSS background 相关元素进行背景图绝对定位； 
+ 不要在 HTML 中使用缩放图片
+缩放图片并没有减少图片的容量，只是控制了图片的大小。
+Image压缩
+使用工具对图片进行压缩，保证质量的同时减少了图片的大小。
+减少对DOM的操作
+减少对DOM的操作，减少页面的重绘。
+二、提前做加载操作
+对域名进行预解析
+例如京东的做法
+<link rel="dns-prefetch" href="//misc.360buyimg.com" />  
+预载入组件或延迟载入组件
+把 CSS 放到代码页上端 
+CSS 放到最顶部，浏览器能够有针对性的对 HTML 页面从顶到下进行解析和渲染。
+使用 new Image对象，对图片进行缓存
+三、提升并行加载
+切分组件到多个域 ，提升服务器的响应能力
+
+四、JavaScript和CSS优化
+从页面中剥离 JavaScript 与 CSS
+剥离后，能够有针对性的对其进行单独的处理策略，比如压缩或者缓存策略。
+精简 JavaScript 与 CSS 
+使用工具压缩JavaScript和CSS文件
+脚本放到 HTML 代码页底部
+减少对页面的阻塞。
+五、异步加载
+  使用Ajax实现异步加载，例如，滚动页面加载后面的内容，这种也比较常见。
+  
 
 
 
